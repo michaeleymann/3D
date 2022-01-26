@@ -47,10 +47,11 @@ function draw() {
   noStroke();
 
   // Shed Some Light
-  pointLight(lightPower,lightPower*0.8,lightPower*0.9,-40,-windowHeight,camZ)
+  pointLight(lightPower,lightPower*0.8,lightPower*0.9,-40,-windowHeight,camZ-100)
+  pointLight(lightPower*noise(1,frameCount/210),lightPower*noise(frameCount/90),lightPower*0.45,30,0,camZ)
   
   // Make A Camera
-  camera(0,20,camZ,1000000*sin(frameCount/200), 1000000,-10000000,0.1*sin(frameCount/100),1,0)
+ myCam = camera(0,20,camZ,1000000*sin(frameCount/200), 1000000,-10000000,0.1*sin(frameCount/100),1,0)
 
   // Draw Boxes from Grid Positions
   beginShape();
