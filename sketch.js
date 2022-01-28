@@ -1,7 +1,7 @@
 // --- VARIABLES ---
 let gridSize;
 let w;
-let pnt = [];
+let floatingThings = []; // Array of Floting Objects
 let camZ = 600; // Camera Starting Position
 let size;
 let latestZ;
@@ -34,7 +34,7 @@ function setup() {
     for (let j = 0; j < gridSize; j++) {
       let z = map(i, 0, gridSize-1, w, -w)
       let x = map(j, 0, gridSize-1, -w, w)
-      pnt.push({x: x, z: z, r: random(), m: random()});
+      floatingThings.push({x: x, z: z, r: random(), m: random()});
       latestZ = z;
     }
   }
@@ -45,41 +45,44 @@ function draw() {
   orbitControl();
   background(0,0,0);
   noStroke();
-
   // Shed Some Light
+  //Top
   pointLight(lightPower,lightPower*0.8,lightPower*0.9,-40,-windowHeight,camZ-100)
-  pointLight(lightPower*noise(1,frameCount/210),lightPower*noise(frameCount/90),lightPower*0.45,30,0,camZ)
-  
+  //Searchlight 1
+  pointLight(lightPower*noise(1,frameCount/210),lightPower*noise(frameCount/90),lightPower*0.45,30,0,camZ-20)
+  //SearchLight 2
+  pointLight(100,100,100,30,0,camZ)
+
   // Make A Camera
  myCam = camera(0,20,camZ,1000000*sin(frameCount/200), 1000000,-10000000,0.1*sin(frameCount/100),1,0)
 
   // Draw Boxes from Grid Positions
   beginShape();
-  for (let p of pnt ){
+  for (let f of floatingThings ){
     push()
     // Let the far away boxes be darker
-    let darkness = (w / 4) / ( camZ - p.z )
-    ambientMaterial(p.r*254*darkness,188*darkness,200*darkness);
+    let darkness = (w / 4) / ( camZ - f.z )
+    ambientMaterial(f.r*254*darkness,188*darkness,200*darkness);
 
-    translate(p.x,300*noise(p.x*0.01,p.z*0.01,frameCount*0.001),p.z)
-    rotateX(noise(p.x,p.z,frameCount*0.005))
-    rotateY(PI+TAU*noise(p.x,p.z,frameCount*0.002))
-    rotateZ(2*noise(p.x,p.z,frameCount*0.005))
+    //Float Effect with Perlin Noise
+    translate(f.x,300*noise(f.x*0.01,f.z*0.01,frameCount*0.001),f.z)
+    rotateX(noise(f.x,f.z,frameCount*0.005))
+    rotateY(PI+TAU*noise(f.x,f.z,frameCount*0.002))
+    rotateZ(2*noise(f.x,f.z,frameCount*0.005))
     //box(10 + p.r*size)
     scale(0.2)
 
-    if (p.m < 0.2) {
+    if (f.m < 0.2) {
       model(tv)
-    } else if (p.m < 0.4) {
+    } else if (f.m < 0.4) {
       model(toaster)
-    } else if (p.m < 0.6 ){
+    } else if (f.m < 0.6 ){
       model(wm)
-    } else if (p.m < 0.8 ) {
+    } else if (f.m < 0.8 ) {
       model(hp) 
     } else {
       model(key)
     }
-    
     pop();
   }
   endShape();
@@ -93,17 +96,16 @@ function draw() {
 
 // --- FUNCTIONS ---
 
-// Only one function to add and remove rows of boxes
+// add and remove rows of boxes
 function addNewRow(){
   // Remove line in front
-  pnt = pnt.slice(gridSize) 
+  floatingThings = floatingThings.slice(gridSize) 
 
   // Add line in the back
   let newZ = latestZ - round(w/gridSize)*2
   for (let i = 0; i < gridSize; i++) {
     let x = map(i, 0, gridSize-1, -w, w)
-    pnt.push({x: x, z: newZ, r: random(), m: random()})
+    floatingThings.push({x: x, z: newZ, r: random(), m: random()})
   }
-
   latestZ = newZ;
 }
